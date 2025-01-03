@@ -1,5 +1,5 @@
 import sequelize, { DataTypes } from '../config/database';
-import { IUser } from '../interfaces/user.interface';
+import bcrypt from 'bcrypt';
 
 import user from '../models/user';
 
@@ -13,6 +13,7 @@ class UserService {
     if (exist) {
       throw Error('user already exist');
     }
+    userData.password = await bcrypt.hash(userData.password, 10);
     const user = await this.user.create(userData);
     return user;
   };
@@ -23,7 +24,8 @@ class UserService {
     if (!user) {
       throw new Error('Invalid email or password');
     }
-    if (credentials.password === user.dataValues.password) {
+    const match = await bcrypt.compare(credentials.password, user.dataValues.password);
+    if (match) {
       return { message: 'logged in successfully!', user };
     } else {
       throw new Error('Invalid email or password');
