@@ -4,38 +4,30 @@ import { IUser } from '../interfaces/user.interface';
 import user from '../models/user';
 
 class UserService {
-  private User = user(sequelize, DataTypes);
 
-  //get all users
-  public getAllUsers = async (): Promise<IUser[]> => {
-    const data = await this.User.findAll();
-    return data;
+  private user = user(sequelize, DataTypes);
+
+  //register user 
+  public registerUser = async (userData: { username: string; email: string; password: string }): Promise<any> => {
+    const exist = await this.user.findOne({ where: { email: userData.email } });
+    if (exist) {
+      throw Error('user already exist');
+    }
+    const user = await this.user.create(userData);
+    return user;
   };
 
-  //create a new user
-  public newUser = async (body) => {
-    const data = await this.User.create(body);
-    return data;
-  };
-
-  //update a user
-  public updateUser = async (id, body) => {
-    await this.User.update(body, {
-      where: { id: id }
-    });
-    return body;
-  };
-
-  //delete a user
-  public deleteUser = async (id) => {
-    await this.User.destroy({ where: { id: id } });
-    return '';
-  };
-
-  //get a single user
-  public getUser = async (id) => {
-    const data = await this.User.findByPk(id);
-    return data;
+  //login user
+  public loginUser = async (credentials: { email: string; password: string }): Promise<any> => {
+    const user = await this.user.findOne({ where: { email: credentials.email } });
+    if (!user) {
+      throw new Error('Invalid email or password');
+    }
+    if (credentials.password === user.dataValues.password) {
+      return { message: 'logged in successfully!', user };
+    } else {
+      throw new Error('Invalid email or password');
+    }
   };
 }
 
