@@ -35,6 +35,8 @@ class UserController {
       const data = await this.UserService.loginUser(req.body);
       res.status(HttpStatus.ACCEPTED).json({
         message: `${data.user.username} ${data.message}`,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken
       });
     } catch (error) {
       next(error);

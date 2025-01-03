@@ -1,6 +1,6 @@
 import sequelize, { DataTypes } from '../config/database';
 import bcrypt from 'bcrypt';
-
+import {generateToken} from '../utils/token.util';
 import user from '../models/user';
 
 class UserService {
@@ -25,8 +25,10 @@ class UserService {
       throw new Error('Invalid email or password');
     }
     const match = await bcrypt.compare(credentials.password, user.dataValues.password);
+    const accessToken = await generateToken({userId: user.dataValues.id,email: user.dataValues.email},process.env.SECRET_TOKEN,{ expiresIn: '1d' });
+    const refreshToken = await generateToken({userId: user.dataValues.id,email: user.dataValues.email},process.env.REFRESH_SECRET_TOKEN,{ expiresIn: '30d' });
     if (match) {
-      return { message: 'logged in successfully!', user };
+      return { message: 'logged in successfully!', user, accessToken, refreshToken };
     } else {
       throw new Error('Invalid email or password');
     }
