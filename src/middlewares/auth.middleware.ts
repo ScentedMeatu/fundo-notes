@@ -1,35 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import HttpStatus from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import { verifyToken } from '../utils/token.util';
 
-/**
- * Middleware to authenticate if user has a valid Authorization token
- * Authorization: Bearer <token>
- *
- * @param {Object} req
- * @param {Object} res
- * @param {Function} next
- */
-export const userAuth = async (
+const userAuthorization = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
+) => {
   try {
     let bearerToken = req.header('Authorization');
-    if (!bearerToken)
+    if (!bearerToken) {
       throw {
         code: HttpStatus.BAD_REQUEST,
-        message: 'Authorization token is required'
+        message: 'Authorization token is required',
       };
+    }
     bearerToken = bearerToken.split(' ')[1];
 
-    const { user }: any = await jwt.verify(bearerToken, 'your-secret-key');
-    res.locals.user = user;
-    res.locals.token = bearerToken;
+    const secret = `${process.env.SECRET_TOKEN}`;
+    const decoded: any = await verifyToken(bearerToken, secret);
+
+    req.body.createdBy = decoded.userId;
     next();
   } catch (error) {
     next(error);
   }
 };
+
+export default userAuthorization;
