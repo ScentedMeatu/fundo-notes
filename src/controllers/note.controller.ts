@@ -131,6 +131,49 @@ class noteControllers {
             });
         }
     };
+
+    public toggleArchive = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          const noteId = req.params.id;
+          const userId = req.body.createdBy;
+      
+          const note = await this.noteServices.toggleArchiveById(noteId, userId);
+          if (note) {
+            res.status(httpStatus.OK).json({
+              message: note.isArchive ? 'Note archived' : 'Note unarchived',
+              archivedNote: note
+            });
+          }
+        } catch (error) {
+          console.error('Error toggling archive status:', error);
+          next({
+            code: httpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Error toggling archive status',
+            error: (error as Error).message
+          });
+        }
+      };
+      
+      public toggleTrash = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          const noteId = req.params.id;
+          const userId = req.body.createdBy;
+          const note = await this.noteServices.toggleTrashById(noteId, userId);
+          if (note) {
+            res.status(httpStatus.OK).json({
+              message: note.isTrash ? 'Note moved to trash' : 'Note restored from trash',
+              trashedNote: note
+            });
+          }
+        } catch (error) {
+          console.error('Error toggling trash status:', error);
+          next({
+            code: httpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Error toggling trash status',
+            error: (error as Error).message
+          });
+        }
+      };
 }
 
 export default noteControllers;
