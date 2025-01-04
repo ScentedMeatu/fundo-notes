@@ -18,6 +18,9 @@ class UserRoutes {
 
     //route to login a user
     this.router.post('/login',this.UserController.login);
+
+    //route for refresh token
+    this.router.post('/refreshtoken',this.UserController.refreshtoken);
   }
 
   public getRoutes = (): IRouter => {

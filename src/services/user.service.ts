@@ -1,6 +1,6 @@
 import sequelize, { DataTypes } from '../config/database';
 import bcrypt from 'bcrypt';
-import {generateToken} from '../utils/token.util';
+import {generateToken, verifyToken} from '../utils/token.util';
 import user from '../models/user';
 
 class UserService {
@@ -25,14 +25,36 @@ class UserService {
       throw new Error('Invalid email or password');
     }
     const match = await bcrypt.compare(credentials.password, user.dataValues.password);
-    const accessToken = await generateToken({userId: user.dataValues.id,email: user.dataValues.email},process.env.SECRET_TOKEN,{ expiresIn: '1d' });
-    const refreshToken = await generateToken({userId: user.dataValues.id,email: user.dataValues.email},process.env.REFRESH_SECRET_TOKEN,{ expiresIn: '30d' });
+    const accessToken = generateToken({userId: user.dataValues.id,email: user.dataValues.email},`${process.env.SECRET_TOKEN}`,{ expiresIn: '1d' });
+    const refreshToken = generateToken({userId: user.dataValues.id,email: user.dataValues.email},`${process.env.REFRESH_SECRET_TOKEN}`,{ expiresIn: '30d' });
+    this.user.update({refreshToken},{where:{id:user.dataValues.id}});
     if (match) {
       return { message: 'logged in successfully!', user, accessToken, refreshToken };
     } else {
       throw new Error('Invalid email or password');
     }
   };
+
+  public refreshToken = async (credentials: { refreshtoken: string }): Promise<any> => {
+    if (!credentials.refreshtoken) {
+      throw new Error('refreshtoken required');
+    } 
+      console.log(credentials.refreshtoken);
+      
+      const decoded = (await verifyToken(
+        credentials.refreshtoken,
+        `${process.env.REFRESH_SECRET_TOKEN}`
+      )) as {userId,email};
+
+      const verified = await this.user.findOne({where:{id:decoded.userId,email:decoded.email}});
+      if(!verified){
+        throw Error('token not found in database')
+      }
+
+      const newToken = await generateToken({userId: verified.dataValues.id,email: verified.dataValues.email},process.env.SECRET_TOKEN,{ expiresIn: '1d' });
+      return newToken;
+    }
+  
 }
 
 export default UserService;

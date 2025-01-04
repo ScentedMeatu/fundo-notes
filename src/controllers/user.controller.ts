@@ -42,6 +42,24 @@ class UserController {
       next(error);
     }
   };
+
+    /**
+ * Controller to use refresh token
+ * @param  {object} Request - request object
+ * @param {object} Response - response object
+ * @param {Function} NextFunction
+ */
+    public refreshtoken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const data = await this.UserService.refreshToken(req.body);
+        console.log(data);
+        res.status(200).json({
+          newToken: data
+        });
+      } catch (error) {
+        next(error);
+      }
+    }
 }
 
 export default UserController;
