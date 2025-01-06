@@ -25,11 +25,11 @@ class UserController {
   };
 
   /**
- * Controller to login a user
- * @param  {object} Request - request object
- * @param {object} Response - response object
- * @param {Function} NextFunction
- */
+   * Controller to login a user
+   * @param  {object} Request - request object
+   * @param {object} Response - response object
+   * @param {Function} NextFunction
+   */
   public login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const data = await this.UserService.loginUser(req.body);
@@ -43,23 +43,57 @@ class UserController {
     }
   };
 
-    /**
- * Controller to use refresh token
- * @param  {object} Request - request object
- * @param {object} Response - response object
- * @param {Function} NextFunction
- */
-    public refreshtoken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      try {
-        const data = await this.UserService.refreshToken(req.body);
-        console.log(data);
-        res.status(200).json({
-          newToken: data
-        });
-      } catch (error) {
-        next(error);
-      }
+  /**
+   * Controller to use refresh token
+   * @param  {object} Request - request object
+   * @param {object} Response - response object
+   * @param {Function} NextFunction
+   */
+  public refreshtoken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const data = await this.UserService.refreshToken(req.body);
+      console.log(data);
+      res.status(200).json({
+        newToken: data
+      });
+    } catch (error) {
+      next(error);
     }
+  };
+
+  /**
+   * Controller for forgot password
+   * @param  {object} Request - request object
+   * @param {object} Response - response object
+   * @param {Function} NextFunction
+   */
+  public forgotPass = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      await this.UserService.forgotPassword(req.body);
+      res.status(200).json({
+        message: 'token sent to mail'
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Controller to reset user password
+   * @param  {object} Request - request object
+   * @param {object} Response - response object
+   * @param {Function} NextFunction
+   */
+  public resetPass = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      await this.UserService.resetPassword(req.body);
+      res.status(200).json({
+        message: 'your password has been reset'
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default UserController;

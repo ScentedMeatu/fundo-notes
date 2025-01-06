@@ -22,6 +22,8 @@ const userAuthorization = async (
     const decoded: any = await verifyToken(bearerToken, secret);
 
     req.body.createdBy = decoded.userId;
+    if (decoded.reset === true)
+      req.body.email = decoded.email;
     next();
   } catch (error) {
     next(error);
