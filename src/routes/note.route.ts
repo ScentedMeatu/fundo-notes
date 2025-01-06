@@ -22,9 +22,9 @@ class NoteRoutes {
 
     this.router.delete('/:id', userAuthorization, this.NoteController.deletePermanently);
 
-    this.router.put('/archive/:id', userAuthorization, this.NoteController.toggleArchive);
+    this.router.put('/:id/archive', userAuthorization, this.NoteController.toggleArchive);
 
-    this.router.put('/trash/:id', userAuthorization, this.NoteController.toggleTrash);
+    this.router.put('/:id/trash', userAuthorization, this.NoteController.toggleTrash);
   }
 
   public getRoutes = (): IRouter => {

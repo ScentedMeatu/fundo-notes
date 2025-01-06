@@ -15,7 +15,7 @@ class UserRoutes {
   private routes = () => {
 
     //route to register a new user
-    this.router.post('/register',this.UserValidator.newUser, this.UserController.register);
+    this.router.post('/',this.UserValidator.newUser, this.UserController.register);
 
     //route to login a user
     this.router.post('/login',this.UserController.login);
