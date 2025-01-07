@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import routes from './routes';
 import ErrorHandler from './middlewares/error.middleware';
 import Logger from './config/logger';
+import swaggerDocs from './utils/swagger';
 
 import morgan from 'morgan';
 
@@ -29,8 +30,13 @@ class App {
 
     this.initializeMiddleWares();
     this.initializeRoutes();
+    this.swaggerCall();
     this.initializeErrorHandlers();
     this.startApp();
+  }
+
+  public swaggerCall(): void{
+    swaggerDocs(this.app,this.port,this.host);
   }
 
   public initializeMiddleWares(): void {

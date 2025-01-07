@@ -1,16 +1,15 @@
-import sequelize, { DataTypes } from "../config/database";
-import note from "../models/note";
+import {Notes} from "../models/index";
 import { INotes } from "../interfaces/note.interface";
 import dotenv from "dotenv";
 dotenv.config();
 
 class noteServices {
 
-    private note = note(sequelize, DataTypes);
-
     public createNote = async (body: INotes): Promise<INotes> => {
         try {
-            const newNote = await this.note.create(body);
+            body.isArchive = false;
+            body.isTrash = false;
+            const newNote = await Notes.create(body);
             return newNote;
         } catch (error) {
             throw new Error('Error creating note');
@@ -19,7 +18,7 @@ class noteServices {
 
     public getNoteById = async (noteId: string, userId: any): Promise<INotes | null> => {
         try {
-            const note = await this.note.findOne({ where: { id: noteId, createdBy: userId } });
+            const note = await Notes.findOne({ where: { id: noteId, createdBy: userId } });
             if (!note) {
                 throw new Error('Note not found');
             }
@@ -32,7 +31,7 @@ class noteServices {
 
     public getNotesByUserId = async (userId: string): Promise<{ data: INotes[], source: string }> => {
         try {
-            const notes = await this.note.findAll({ where: { createdBy: userId } });
+            const notes = await Notes.findAll({ where: { createdBy: userId } });
             if (!notes || notes.length === 0) {
                 throw new Error('No notes found for this user');
             }
@@ -44,7 +43,7 @@ class noteServices {
 
     public updateNoteById = async (noteId: string, userId: any, updatedData: any): Promise<void> => {
         try {
-            const note = await this.note.update(updatedData, { where: { id: noteId, createdBy: userId } });
+            const note = await Notes.update(updatedData, { where: { id: noteId, createdBy: userId } });
             if (!note) {
                 throw new Error('Note not found or unauthorized');
             }
@@ -56,13 +55,13 @@ class noteServices {
 
     public deletePermanentlyById = async (noteId: string, userId: any): Promise<void> => {
         try {
-            const note = await this.note.findOne({ where: { id: noteId, createdBy: userId, isTrash: true} });
+            const note = await Notes.findOne({ where: { id: noteId, createdBy: userId, isTrash: true} });
 
             if (!note) {
                 throw new Error('Note not found or not authorized');
             }
 
-            await this.note.destroy({ where: { id: noteId } });
+            await Notes.destroy({ where: { id: noteId } });
 
         } catch (error) {
             throw error;
@@ -71,7 +70,8 @@ class noteServices {
 
     public toggleArchiveById = async (noteId: string, userId: any): Promise<INotes | null> => {
         try {
-          const note = await this.note.findOne({where:{ id: noteId , createdBy: userId, isTrash: false }}); 
+            console.log(noteId+' '+userId);
+          const note = await Notes.findOne({where:{ id: noteId , createdBy: userId, isTrash: false}}); 
           
           if (!note) {
             throw new Error('Note not found or user not authorized'); 
@@ -88,7 +88,7 @@ class noteServices {
       
       public toggleTrashById = async (noteId: string, userId: any): Promise<INotes | null> => {
         try {
-          const note = await this.note.findOne({where: {id: noteId ,createdBy: userId }});
+          const note = await Notes.findOne({where: {id: noteId ,createdBy: userId }});
           if (!note) {
             throw new Error('Note not found or user not authorized');
           }
