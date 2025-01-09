@@ -20,6 +20,7 @@ class UserRoutes {
      *   post:
      *     tags:
      *       - User
+     *     summary: register
      *     description: Allows a user to register.
      *     requestBody:
      *       required: true
@@ -51,6 +52,7 @@ class UserRoutes {
      *   post:
      *     tags: 
      *        - User
+     *     summary: login
      *     description: Allows a user to login.
      *     requestBody:
      *       required: true
@@ -79,6 +81,7 @@ class UserRoutes {
      *   post:
      *     tags: 
      *        - User
+     *     summary: refresh token
      *     description: Allows a user get new access token.
      *     requestBody:
      *       required: true
@@ -104,6 +107,7 @@ class UserRoutes {
      *   post:
      *     tags: 
      *        - User
+     *     summary: forgot password
      *     description: Allows a user get access token in mail.
      *     requestBody:
      *       required: true
@@ -129,6 +133,7 @@ class UserRoutes {
      *   post:
      *     tags: 
      *        - User
+     *     summary: reset password
      *     description: Allows a user to reset password through access token from mail.
      *     requestBody:
      *       required: true

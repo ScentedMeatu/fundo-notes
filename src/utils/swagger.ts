@@ -7,7 +7,7 @@ const logger = Logger.logger;
 
 const options: swaggerJSDoc.Options = {
   definition: {
-    openapi: "3.0.0",
+    openapi: "3.1.0",
     info: {
       title: "FundoNotes",
       version: "1.0.0",

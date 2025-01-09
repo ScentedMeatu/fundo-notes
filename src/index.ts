@@ -21,6 +21,7 @@ class App {
   private logStream = Logger.logStream;
   private logger = Logger.logger;
   public errorHandler = new ErrorHandler();
+  public server;
 
   constructor() {
     this.app = express();
@@ -32,11 +33,10 @@ class App {
     this.initializeRoutes();
     this.swaggerCall();
     this.initializeErrorHandlers();
-    this.startApp();
   }
 
-  public swaggerCall(): void{
-    swaggerDocs(this.app,this.port,this.host);
+  public swaggerCall(): void {
+    swaggerDocs(this.app, this.port, this.host);
   }
 
   public initializeMiddleWares(): void {
@@ -57,11 +57,14 @@ class App {
     this.app.use(this.errorHandler.notFound);
   }
 
-  public startApp(): void {
-    this.app.listen(this.port, () => {
-      this.logger.info(
-        `Server started at ${this.host}:${this.port}/api/${this.api_version}/`
-      );
+  public startApp(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.server = this.app.listen(this.port, () => {
+        this.logger.info(
+          `Server started at ${this.host}:${this.port}/api/${this.api_version}/`
+        );
+        resolve(this.server);
+      }).on('error', reject);
     });
   }
 
@@ -71,5 +74,13 @@ class App {
 }
 
 const app = new App();
-
 export default app;
+
+
+if (require.main === module) {
+  app.startApp().then((server) => {
+    console.log('Server started:', server.address())
+  }).catch((err) => {
+    console.error('Error starting server:', err);
+  });
+}

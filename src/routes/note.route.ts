@@ -18,6 +18,7 @@ class NoteRoutes {
      *   post:
      *     tags:
      *       - Notes
+     *     summary: create a note
      *     description: Allows a user to create a note.
      *     requestBody:
      *       required: true
@@ -46,6 +47,7 @@ class NoteRoutes {
      *   get:
      *     tags:
      *       - Notes
+     *     summary: get all notes
      *     description: Allows a user to get all of his notes.
      *     responses:
      *       200:
@@ -61,6 +63,7 @@ class NoteRoutes {
      *   get:
      *     tags:
      *       - Notes
+     *     summary: get note by id
      *     description: Allows a user to get his note by id.
      *     parameters:
      *       - name: id
@@ -83,6 +86,7 @@ class NoteRoutes {
      *   put:
      *     tags:
      *       - Notes
+     *     summary: update note
      *     description: Allows a user to update his note by id.
      *     parameters:
      *       - name: id
@@ -118,6 +122,7 @@ class NoteRoutes {
      *   delete:
      *     tags:
      *       - Notes
+     *     summary: delete note
      *     description: Allows a user to delete his note by id.
      *     parameters:
      *       - name: id
@@ -140,6 +145,7 @@ class NoteRoutes {
      *   put:
      *     tags:
      *       - Notes
+     *     summary: archive note
      *     description: Allows a user to archive his note by id.
      *     parameters:
      *       - name: id
@@ -162,6 +168,7 @@ class NoteRoutes {
      *   put:
      *     tags:
      *       - Notes
+     *     summary: trash note
      *     description: Allows a user to trash his note by id.
      *     parameters:
      *       - name: id
