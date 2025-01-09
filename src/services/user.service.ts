@@ -23,7 +23,7 @@ class UserService {
       throw new Error('Invalid email');
     }
     const match = await bcrypt.compare(credentials.password, user.dataValues.password);
-    const accessToken = generateToken({userId: user.dataValues.id,email: user.dataValues.email},`${process.env.SECRET_TOKEN}`,{ expiresIn: '1d' });
+    const accessToken = generateToken({userId: user.dataValues.id,email: user.dataValues.email},`${process.env.SECRET_TOKEN}`,{ expiresIn: '7d' });
     const refreshToken = generateToken({userId: user.dataValues.id,email: user.dataValues.email},`${process.env.REFRESH_SECRET_TOKEN}`,{ expiresIn: '30d' });
     Users.update({refreshToken},{where:{id:user.dataValues.id}});
     if (match) {
