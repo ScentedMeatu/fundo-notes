@@ -1,4 +1,4 @@
-import {Notes} from "../models/index";
+import { Notes } from "../models/index";
 import { INotes } from "../interfaces/note.interface";
 import dotenv from "dotenv";
 import redisClient from "../config/redis";
@@ -11,6 +11,7 @@ class noteServices {
             body.isArchive = false;
             body.isTrash = false;
             const newNote = await Notes.create(body);
+            redisClient.flushAll();
             return newNote;
         } catch (error) {
             throw new Error('Error creating note');
@@ -23,7 +24,7 @@ class noteServices {
             if (!note) {
                 throw new Error('Note not found');
             }
-            await redisClient.setEx(`Note?id=${note.dataValues.id}&user=${note.dataValues.createdBy}`,3600,JSON.stringify(note));
+            await redisClient.setEx(`Note?id=${note.dataValues.id}&user=${note.dataValues.createdBy}`, 3600, JSON.stringify(note));
             return note;
         } catch (error) {
             console.error('Error in getNoteById:', error);
@@ -37,7 +38,7 @@ class noteServices {
             if (!notes || notes.length === 0) {
                 throw new Error('No notes found for this user');
             }
-            redisClient.setEx(`Notes?user=${userId}`,3600,JSON.stringify(notes));
+            redisClient.setEx(`Notes?user=${userId}`, 3600, JSON.stringify(notes));
             return { data: notes, source: 'Data retrieved from database' };
         } catch (error) {
             throw error;
@@ -50,7 +51,7 @@ class noteServices {
             if (!note) {
                 throw new Error('Note not found or unauthorized');
             }
-
+            redisClient.flushAll();
         } catch (error) {
             throw error;
         }
@@ -58,13 +59,13 @@ class noteServices {
 
     public deletePermanentlyById = async (noteId: string, userId: any): Promise<void> => {
         try {
-            const note = await Notes.findOne({ where: { id: noteId, createdBy: userId, isTrash: true} });
-
+            const note = await Notes.findOne({ where: { id: noteId, createdBy: userId, isTrash: true } });
             if (!note) {
                 throw new Error('Note not found or not authorized');
             }
 
             await Notes.destroy({ where: { id: noteId } });
+            redisClient.flushAll();
 
         } catch (error) {
             throw error;
@@ -73,39 +74,41 @@ class noteServices {
 
     public toggleArchiveById = async (noteId: string, userId: any): Promise<INotes | null> => {
         try {
-            console.log(noteId+' '+userId);
-          const note = await Notes.findOne({where:{ id: noteId , createdBy: userId, isTrash: false}}); 
-          
-          if (!note) {
-            throw new Error('Note not found or user not authorized'); 
-          }
-          
-          note.isArchive = !note.isArchive; 
-          await note.save();
-          return note;
+            console.log(noteId + ' ' + userId);
+            const note = await Notes.findOne({ where: { id: noteId, createdBy: userId, isTrash: false } });
+
+            if (!note) {
+                throw new Error('Note not found or user not authorized');
+            }
+
+            note.isArchive = !note.isArchive;
+            await note.save();
+            redisClient.flushAll();
+            return note;
         } catch (error) {
-          console.error('Error in toggleArchive:', error); 
-          throw error;
+            console.error('Error in toggleArchive:', error);
+            throw error;
         }
-      };
-      
-      public toggleTrashById = async (noteId: string, userId: any): Promise<INotes | null> => {
+    };
+
+    public toggleTrashById = async (noteId: string, userId: any): Promise<INotes | null> => {
         try {
-          const note = await Notes.findOne({where: {id: noteId ,createdBy: userId }});
-          if (!note) {
-            throw new Error('Note not found or user not authorized');
-          }
-          note.isTrash = !note.isTrash;
-          if (note.isTrash) {
-            note.isArchive = false;
-          }
-          await note.save(); 
-          return note;
+            const note = await Notes.findOne({ where: { id: noteId, createdBy: userId } });
+            if (!note) {
+                throw new Error('Note not found or user not authorized');
+            }
+            note.isTrash = !note.isTrash;
+            if (note.isTrash) {
+                note.isArchive = false;
+            }
+            await note.save();
+            redisClient.flushAll();
+            return note;
         } catch (error) {
-          console.error('Error in toggleTrash:', error);
-          throw error;
+            console.error('Error in toggleTrash:', error);
+            throw error;
         }
-      };
+    };
 }
 
 export default noteServices;
