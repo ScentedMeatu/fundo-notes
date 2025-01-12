@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import {generateToken, verifyToken} from '../utils/token.util';
 import {Users} from '../models/index';
 import { sendPasswordResetToken } from '../utils/mail.util';
+import { sendMessage } from '../utils/rabbitmq.util';
 
 class UserService {
 
@@ -13,6 +14,7 @@ class UserService {
     }
     userData.password = await bcrypt.hash(userData.password, 10);
     const user = await Users.create(userData);
+    sendMessage(user);
     return user;
   };
 

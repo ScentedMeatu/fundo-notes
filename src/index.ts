@@ -9,6 +9,7 @@ import routes from './routes';
 import ErrorHandler from './middlewares/error.middleware';
 import Logger from './config/logger';
 import swaggerDocs from './utils/swagger';
+import { initRabbitMQ } from './utils/rabbitmq.util';
 
 import morgan from 'morgan';
 
@@ -80,6 +81,7 @@ export default app;
 if (require.main === module) {
   app.startApp().then((server) => {
     console.log('Server started:', server.address())
+    initRabbitMQ();
   }).catch((err) => {
     console.error('Error starting server:', err);
   });
